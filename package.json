@@ -1,7 +1,19 @@
 {
   "dependencies": {
+    "console": "^0.7.2",
     "express": "^4.18.2",
     "inquirer": "^8.2.4",
-    "mysql2": "^3.6.0"
-  }
+    "mysql2": "^3.6.0",
+    "nodemon": "^3.0.1",
+    "table": "^6.8.1"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "employee-tracker",
+  "description": "mySQL Employee Tracker",
+  "version": "1.0.0",
+  "main": "server.js",
+  "author": "Peter Janasz",
+  "license": "ISC"
 }
