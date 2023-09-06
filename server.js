@@ -124,19 +124,65 @@ const addNewDepartment = () => {
   ];
 
   inquirer.prompt(questions)
-  .then(response => {
-    const query = `INSERT INTO department (name) VALUES (?)`;
-    db.query(query, [response.name], (err, res) => {
-      if (err) throw err;
-      console.log(`Successfully inserted ${response.name} department at id ${res.insertId}`);
-      startPrompt();
+    .then(response => {
+      const query = `INSERT INTO department (name) VALUES (?)`;
+      db.query(query, [response.name], (err, res) => {
+        if (err) throw err;
+        console.log(`Successfully inserted ${response.name} department at id ${res.insertId}`);
+        startPrompt();
+      });
+    })
+    .catch(err => {
+      console.error(err);
     });
-  })
-  .catch(err => {
-    console.error(err);
-  });
 }
 
+const addNewRole = () => {
+  const departmentChoices = [];
+  db.query("SELECT * FROM DEPARTMENT", (err, res) => {
+    if (err) throw err;
+
+    res.forEach(department => {
+      let departmentChoice = {
+        name: department.name,
+        value: department.id
+      }
+      departmentChoices.push(departmentChoice);
+    });
+
+    let questions = [
+      {
+        type: "input",
+        name: "title",
+        message: "What is the title of the new role?"
+      },
+      {
+        type: "input",
+        name: "salary",
+        message: "What is the salary of the new role?"
+      },
+      {
+        type: "list",
+        name: "department",
+        choices: departmentChoices,
+        message: "Which department is this role in?"
+      }
+    ];
+
+    inquirer.prompt(questions)
+      .then(response => {
+        const query = `INSERT INTO ROLE (title, salary, department_id) VALUES (?, ?, ?)`;
+        db.query(query, [response.title, response.salary, response.department], (err, res) => {
+          if (err) throw err;
+          console.log(`Successfully inserted ${response.title} role at id ${res.insertId}`);
+          startPrompt();
+        });
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  });
+}
 
 
 
