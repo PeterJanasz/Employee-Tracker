@@ -295,7 +295,7 @@ const updateRole = () => {
           type: "list",
           name: "id",
           choices: employeeChoice,
-          message: "Which employee's role would you like to update?"
+          message: "Which employee would you like to update?"
         },
         {
           type: "list",
@@ -320,9 +320,9 @@ const updateRole = () => {
           });
         })
         .catch(err => {
-          console.error(err);
-          startPrompt();
-        });
+      console.error(err);
+      startPrompt();
+    });
     })
   });
 }

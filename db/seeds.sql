@@ -17,11 +17,11 @@ VALUES ("Accountant", 125000, 2),
         ("Software Engineer", 120000, 1);
 
 
-INSERT INTO employees (first_name, last_name, role_id, manager_id)
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("John", "Smith", 1, NULL),
         ("Jane", "Doe", 1, 1),
         ("Emily", "Johnson", 1, 1),
-        ("Marcu", "Martinez", 2, NULL),
+        ("Marcus", "Martinez", 2, NULL),
         ("Sarah", "Thompson", 2, 2),
         ("David", "Rodriguez", 2, 2),
         ("Olivia", "Brown", 3, NULL),
