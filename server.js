@@ -3,7 +3,6 @@ const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const PORT = process.env.PORT || 3001;
 const app = express();
-const table = require('table');
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -92,9 +91,11 @@ function startPrompt() {
           db.end();
       }
     })
-    .catch(err => {
-      console.error(err);
-    });
+    .catch((err) => {
+      console.error("An error occurred:", err.message);
+      // Handle the error appropriately, e.g., retry, exit gracefully, or log it.
+      startPrompt(); // Restart the prompt or take other actions as needed.
+    });    
 }
 
 const viewAll = (table) => {
@@ -140,58 +141,67 @@ const addNewDepartment = () => {
     })
     .catch(err => {
       console.error(err);
+      startPrompt();
     });
 }
 
 const addNewRole = () => {
   const departmentChoices = [];
-  db.query("SELECT * FROM DEPARTMENT", (err, res) => {
+  db.query("SELECT * FROM DEPARTMENT", (err, departments) => {
     if (err) throw err;
 
-    res.forEach(department => {
-      let departmentChoice = {
+    departments.forEach((department) => {
+      const departmentChoice = {
         name: department.name,
-        value: department.id
+        value: department.id,
       };
       departmentChoices.push(departmentChoice);
     });
 
-    let questions = [
+    const questions = [
       {
         type: "input",
-        name: "Title",
-        message: "What is the title of the new role?"
+        name: "title",
+        message: "What is the title of the new role?",
       },
       {
         type: "input",
-        name: "Salary",
-        message: "What is the salary of the new role?"
+        name: "salary",
+        message: "What is the salary of the new role?",
+        validate: (input) => {
+          const salary = parseFloat(input);
+          if (isNaN(salary) || salary <= 0) {
+            return "Please enter a valid numeric salary greater than 0.";
+          }
+          return true; 
+        },
       },
       {
         type: "list",
-        name: "Department",
+        name: "departmentId",
         choices: departmentChoices,
-        message: "Which department is this role for?"
+        message: "Which department is this role for?",
       }
     ];
 
     inquirer.prompt(questions)
-      .then(response => {
+      .then((response) => {
         const query = `INSERT INTO ROLE (title, salary, department_id) VALUES (?, ?, ?)`;
-        db.query(query, [response.title, response.salary, response.department], (err, res) => {
+        db.query(query, [response.title, response.salary, response.departmentId], (err, res) => {
           if (err) throw err;
-          console.log(`Successfully added ${response.title} role in id ${response.insertId}`);
+          console.log(`Successfully added ${response.title} role as id ${res.insertId}`);
           startPrompt();
         });
       })
       .catch(err => {
         console.error(err);
+        startPrompt();
       });
   });
-}
+};
 
 const addNewEmployee = () => {
-  db.query("SELECT * FROM EMPLOYEE", (err, emplRes) => {
+  db.query("SELECT * FROM EMPLOYEE", (err, employeeResults) => {
     if (err) throw err;
     const employeeChoices = [
       {
@@ -199,17 +209,17 @@ const addNewEmployee = () => {
         value: 0
       }
     ];
-    emplRes.forEach(({ first_name, last_name, id }) => {
+    employeeResults.forEach(({ first_name, last_name, id }) => {
       employeeChoices.push({
         name: first_name + " " + last_name,
         value: id
       });
     });
 
-    db.query("SELECT * FROM ROLE", (err, rolRes) => {
+    db.query("SELECT * FROM ROLE", (err, roleResults) => {
       if (err) throw err;
       const roleChoices = [];
-      rolRes.forEach(({ title, id }) => {
+      roleResults.forEach(({ title, id }) => {
         roleChoices.push({
           name: title,
           value: id
@@ -253,8 +263,67 @@ const addNewEmployee = () => {
         })
         .catch(err => {
           console.error(err);
+          startPrompt();
         });
     });
+  });
+}
+
+const updateRole = () => { 
+  db.query("SELECT * FROM EMPLOYEE", (err, employeeResults) => {
+    if (err) throw err;
+    const employeeChoice = [];
+    employeeResults.forEach(({ first_name, last_name, id }) => {
+      employeeChoice.push({
+        name: first_name + " " + last_name,
+        value: id
+      });
+    });
+
+    db.query("SELECT * FROM ROLE", (err, roleResults) => {
+      if (err) throw err;
+      const roleChoice = [];
+      roleResults.forEach(({ title, id }) => {
+        roleChoice.push({
+          name: title,
+          value: id
+        });
+      });
+
+      let questions = [
+        {
+          type: "list",
+          name: "id",
+          choices: employeeChoice,
+          message: "Which employee's role would you like to update?"
+        },
+        {
+          type: "list",
+          name: "role_id",
+          choices: roleChoice,
+          message: "What is the employee's new role?"
+        }
+      ];
+
+      inquirer.prompt(questions)
+        .then(response => {
+          const query = `UPDATE EMPLOYEE SET ? WHERE ?? = ?;`;
+          db.query(query, [
+            { role_id: response.role_id },
+            "id",
+            response.id
+          ], (err, res) => {
+            if (err) throw err;
+
+            console.log("Successfully updated employee's role!");
+            startPrompt();
+          });
+        })
+        .catch(err => {
+          console.error(err);
+          startPrompt();
+        });
+    })
   });
 }
 
