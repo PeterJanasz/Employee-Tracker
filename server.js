@@ -1,28 +1,33 @@
+// Import required libraries and modules
 const express = require('express');
 const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const PORT = process.env.PORT || 3001;
 const app = express();
 
+// Middleware to parse incoming JSON and urlencoded data
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
+// Create a connection to the MySQL database
 const db = mysql.createConnection(
   {
-    host: '127.0.0.1', // aka localhost
-    user: 'root',
-    password: 'mysql1234',
-    database: 'employees_db'
+    host: '127.0.0.1', // Database server (localhost)
+    user: 'root', // Database user
+    password: 'mysql1234', // Database password
+    database: 'employees_db' // Database name
   },
   console.log(`Connected to the employees database.`)
 );
 
+// Connect to the database
 db.connect((err) => {
   if (err) throw err;
   console.log(`Connected to the employees database.`);
-  startPrompt();
+  startPrompt(); // Start the main application prompt
 });
 
+// Main application prompt
 function startPrompt() {
   const startQuestion = [{
     type: "list",
@@ -36,12 +41,6 @@ function startPrompt() {
       "Add a role",
       "Add an employee",
       "Update employee role",
-      // "Update employee's manager",
-      // "View employees by manager",
-      // "Delete a department",
-      // "Delete a role",
-      // "Delete an employee",
-      // "View the total utilized budget of a department",
       "Quit"]
   }];
 
@@ -69,35 +68,17 @@ function startPrompt() {
         case "Update employee role":
           updateRole();
           break;
-        // case "View employees by manager":
-        //   viewEmployeeByManager();
-        //   break;
-        // case "Update employee's manager":
-        //   updateManager();
-        //   break;
-        // case "Delete a department":
-        //   deleteDepartment();
-        //   break;
-        // case "Delete a role":
-        //   deleteRole();
-        //   break;
-        // case "Delete an employee":
-        //   deleteEmployee();
-        //   break;
-        // case "View the total utilized budget of a department":
-        //   viewBudget();
-        //   break;
         default:
           db.end();
       }
     })
     .catch((err) => {
       console.error("An error occurred:", err.message);
-      // Handle the error appropriately, e.g., retry, exit gracefully, or log it.
-      startPrompt(); // Restart the prompt or take other actions as needed.
-    });    
+      startPrompt(); // Restart the prompt if an error occurs
+    });
 }
 
+// Function to view all records in a specified table (departments, roles, or employees)
 const viewAll = (table) => {
   let query;
   if (table === "DEPARTMENT") {
@@ -115,12 +96,12 @@ const viewAll = (table) => {
   }
   db.query(query, (err, res) => {
     if (err) throw err;
-    console.table(res);
-
-    startPrompt();
+    console.table(res); // Display the result in a table format
+    startPrompt(); // Return to the main menu
   });
 };
 
+// Function to add a new department
 const addNewDepartment = () => {
   let questions = [
     {
@@ -136,15 +117,16 @@ const addNewDepartment = () => {
       db.query(query, [response.name], (err, res) => {
         if (err) throw err;
         console.log(`Successfully inserted ${response.name} department as id ${res.insertId}`);
-        startPrompt();
+        startPrompt(); // Return to the main menu
       });
     })
     .catch(err => {
       console.error(err);
-      startPrompt();
+      startPrompt(); // Return to the main menu if an error occurs
     });
 }
 
+// Function to add a new role
 const addNewRole = () => {
   const departmentChoices = [];
   db.query("SELECT * FROM DEPARTMENT", (err, departments) => {
@@ -173,7 +155,7 @@ const addNewRole = () => {
           if (isNaN(salary) || salary <= 0) {
             return "Please enter a valid numeric salary greater than 0.";
           }
-          return true; 
+          return true;
         },
       },
       {
@@ -190,27 +172,28 @@ const addNewRole = () => {
         db.query(query, [response.title, response.salary, response.departmentId], (err, res) => {
           if (err) throw err;
           console.log(`Successfully added ${response.title} role as id ${res.insertId}`);
-          startPrompt();
+          startPrompt(); // Return to the main menu
         });
       })
       .catch(err => {
         console.error(err);
-        startPrompt();
+        startPrompt(); // Return to the main menu if an error occurs
       });
   });
 };
 
+// Function to add a new employee
 const addNewEmployee = () => {
   db.query("SELECT * FROM EMPLOYEE", (err, employeeResults) => {
     if (err) throw err;
-    const employeeChoices = [
+    const employeeChoice = [
       {
         name: 'None',
         value: 0
       }
     ];
     employeeResults.forEach(({ first_name, last_name, id }) => {
-      employeeChoices.push({
+      employeeChoice.push({
         name: first_name + " " + last_name,
         value: id
       });
@@ -246,7 +229,7 @@ const addNewEmployee = () => {
         {
           type: "list",
           name: "manager_id",
-          choices: employeeChoices,
+          choices: employeeChoice,
           message: "Who is the employee's manager? (If Applicable)"
         }
       ];
@@ -258,18 +241,19 @@ const addNewEmployee = () => {
           db.query(query, [response.first_name, response.last_name, response.role_id, manager_id], (err, res) => {
             if (err) throw err;
             console.log(`Successfully added employee ${response.first_name} ${response.last_name} with id ${res.insertId}`);
-            startPrompt();
+            startPrompt(); // Return to the main menu
           });
         })
         .catch(err => {
           console.error(err);
-          startPrompt();
+          startPrompt(); // Return to the main menu if an error occurs
         });
     });
   });
 }
 
-const updateRole = () => { 
+// Function to update an employee's role
+const updateRole = () => {
   db.query("SELECT * FROM EMPLOYEE", (err, employeeResults) => {
     if (err) throw err;
     const employeeChoice = [];
@@ -302,35 +286,40 @@ const updateRole = () => {
           name: "role_id",
           choices: roleChoice,
           message: "What is the employee's new role?"
+        },
+        {
+          type: "list",
+          name: "manager_id",
+          choices: employeeChoice,
+          message: "Who is the employee's new manager? (If Applicable)"
         }
       ];
 
       inquirer.prompt(questions)
         .then(response => {
-          const query = `UPDATE EMPLOYEE SET ? WHERE ?? = ?;`;
-          db.query(query, [
-            { role_id: response.role_id },
-            "id",
-            response.id
-          ], (err, res) => {
+          const query = `UPDATE EMPLOYEE SET role_id = ?, manager_id = ? WHERE id = ?;`;
+          db.query(query, [response.role_id, response.manager_id, response.id], (err, res) => {
             if (err) throw err;
 
-            console.log("Successfully updated employee's role!");
-            startPrompt();
+            console.log("Successfully updated employee's role and manager!");
+            startPrompt(); // Return to the main menu
           });
         })
         .catch(err => {
-      console.error(err);
-      startPrompt();
-    });
+          console.error(err);
+          startPrompt(); // Return to the main menu if an error occurs
+        });
     })
   });
 }
 
+
+// Middleware to handle 404 errors
 app.use((req, res) => {
   res.status(404).end();
 });
 
+// Start the Express server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

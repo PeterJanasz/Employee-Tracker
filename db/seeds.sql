@@ -22,14 +22,14 @@ VALUES ("John", "Smith", 2, NULL),
         ("Jane", "Doe", 1, 1),
         ("Emily", "Johnson", 1, 1),
         ("Marcus", "Martinez", 7, NULL),
-        ("Sarah", "Thompson", 6, 2),
-        ("David", "Rodriguez", 6, 2),
+        ("Sarah", "Thompson", 6, 4),
+        ("David", "Rodriguez", 6, 4),
         ("Olivia", "Brown", 5, NULL),
-        ("Ethan", "Williams", 3, 3),
-        ("Ava", "Davis", 3, 3),
+        ("Ethan", "Williams", 3, 7),
+        ("Ava", "Davis", 3, 7),
         ("Jackson", "Anderson", 4, NULL),
-        ("Mia", "Garcia", 8, 4),
-        ("Liam", "Taylor", 8, 4);
+        ("Mia", "Garcia", 8, 10),
+        ("Liam", "Taylor", 8, 10);
 
 
 
