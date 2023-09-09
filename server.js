@@ -29,33 +29,33 @@ function startPrompt() {
     name: "action",
     message: "What would you like to do?",
     loop: false,
-    choices: ["View all employees",
+    choices: ["View all departments",
       "View all roles",
-      "View all departments",
-      "Add an employee",
-      "Add a role",
+      "View all employees",
       "Add a department",
-      "Update role for an employee",
-      "Update employee's manager",
-      "View employees by manager",
-      "Delete a department",
-      "Delete a role",
-      "Delete an employee",
-      "View the total utilized budget of a department",
+      "Add a role",
+      "Add an employee",
+      "Update employee role",
+      // "Update employee's manager",
+      // "View employees by manager",
+      // "Delete a department",
+      // "Delete a role",
+      // "Delete an employee",
+      // "View the total utilized budget of a department",
       "Quit"]
   }];
 
   inquirer.prompt(startQuestion)
     .then(response => {
       switch (response.action) {
-        case "View all employees":
-          viewAll("EMPLOYEE");
+        case "View all departments":
+          viewAll("DEPARTMENT");
           break;
         case "View all roles":
           viewAll("ROLE");
           break;
-        case "View all departments":
-          viewAll("DEPARTMENT");
+        case "View all employees":
+          viewAll("EMPLOYEE");
           break;
         case "Add a department":
           addNewDepartment();
@@ -66,27 +66,27 @@ function startPrompt() {
         case "Add an employee":
           addNewEmployee();
           break;
-        case "Update role for employee":
+        case "Update employee role":
           updateRole();
           break;
-        case "View employees by manager":
-          viewEmployeeByManager();
-          break;
-        case "Update employee's manager":
-          updateManager();
-          break;
-        case "Delete a department":
-          deleteDepartment();
-          break;
-        case "Delete a role":
-          deleteRole();
-          break;
-        case "Delete an employee":
-          deleteEmployee();
-          break;
-        case "View the total utilized budget of a department":
-          viewBudget();
-          break;
+        // case "View employees by manager":
+        //   viewEmployeeByManager();
+        //   break;
+        // case "Update employee's manager":
+        //   updateManager();
+        //   break;
+        // case "Delete a department":
+        //   deleteDepartment();
+        //   break;
+        // case "Delete a role":
+        //   deleteRole();
+        //   break;
+        // case "Delete an employee":
+        //   deleteEmployee();
+        //   break;
+        // case "View the total utilized budget of a department":
+        //   viewBudget();
+        //   break;
         default:
           db.end();
       }

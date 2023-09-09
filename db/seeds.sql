@@ -18,18 +18,18 @@ VALUES ("Accountant", 125000, 2),
 
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES ("John", "Smith", 1, NULL),
+VALUES ("John", "Smith", 2, NULL),
         ("Jane", "Doe", 1, 1),
         ("Emily", "Johnson", 1, 1),
-        ("Marcus", "Martinez", 2, NULL),
-        ("Sarah", "Thompson", 2, 2),
-        ("David", "Rodriguez", 2, 2),
-        ("Olivia", "Brown", 3, NULL),
+        ("Marcus", "Martinez", 7, NULL),
+        ("Sarah", "Thompson", 6, 2),
+        ("David", "Rodriguez", 6, 2),
+        ("Olivia", "Brown", 5, NULL),
         ("Ethan", "Williams", 3, 3),
         ("Ava", "Davis", 3, 3),
         ("Jackson", "Anderson", 4, NULL),
-        ("Mia", "Garcia", 4, 4),
-        ("Liam", "Taylor", 4, 4);
+        ("Mia", "Garcia", 8, 4),
+        ("Liam", "Taylor", 8, 4);
 
 
 
