@@ -34,14 +34,15 @@ function startPrompt() {
     name: "action",
     message: "What would you like to do?",
     loop: false,
-    choices: ["View all departments",
-      "View all roles",
-      "View all employees",
-      "Add a department",
-      "Add a role",
-      "Add an employee",
-      "Update employee role",
-      "Quit"]
+    choices:
+      ["View all departments",
+        "View all roles",
+        "View all employees",
+        "Add a department",
+        "Add a role",
+        "Add an employee",
+        "Update employee role",
+        "Quit"]
   }];
 
   inquirer.prompt(startQuestion)
@@ -312,7 +313,6 @@ const updateRole = () => {
     })
   });
 }
-
 
 // Middleware to handle 404 errors
 app.use((req, res) => {
